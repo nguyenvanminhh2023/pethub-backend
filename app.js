@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const userRoutes = require('./routes/user.route');
+const postRoutes = require('./routes/post.route');
 
 const app = express();
 require('dotenv').config();
@@ -45,3 +46,4 @@ app.use(function (req, res, next) {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);

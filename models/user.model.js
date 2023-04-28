@@ -12,7 +12,7 @@ const userSchema = new Schema({
     address: { type: String, required: true },
     phone: { type: String, required: true },
     avatar: { type: String },
-    favorite: [{ type: mongoose.Types.ObjectId, ref: 'Place' }]
+    favorite: [{ type: mongoose.Types.ObjectId, ref: 'Post' }]
 });
 
 userSchema.set('toJSON', {
