@@ -135,6 +135,7 @@ const getPosts = async (req, res, next) => {
         address: post.address,
         price: post.price,
         species: post.species,
+        age: post.age,
         image: post.images[0],
         star: post.star,
         views: post.views,
