@@ -149,6 +149,42 @@ const getPosts = async (req, res, next) => {
   });
 }
 
+const getPostById = async (req, res, next) => {
+  const postId = req.params.pid;
+
+  let post, creator;
+
+  try {
+    post = await Post.findById(postId);
+    creator = await User.findById(post.creator);
+  } catch (err) {
+    res.status(500).send({ message: 'Something went wrong, could not find a post.' });
+    console.log(err);
+    return;
+  }
+
+  if (!post) {
+    res.status(404).send({ message: 'Could not find post for the provided id.' })
+    return;
+  }
+  post.views += 1;
+  post.save();
+
+  res.json(
+    {
+      post: post.toJSON(),
+      creator: {
+        id: creator._id,
+        username: creator.username,
+        address: creator.address,
+        email: creator.email,
+        phone: creator.phone,
+        avatar: creator.avatar
+      }
+    }
+  );
+}
+
 const approvePost = async (req, res, next) => {
   const { userId } = req.userData;
   const { pid } = req.params;
@@ -177,6 +213,61 @@ const approvePost = async (req, res, next) => {
   };
 }
 
+const postReview = async (req, res, next) => {
+  const postId = req.params.pid;
+  const review = req.body.review;
+  if (!postId) {
+    res.status(401).send({ message: 'Invalid post ID' });
+    return;
+  }
+  try {
+    const post = await Post.findById(postId);
+    let existingReview = post.reviews.filter(value => value.creator == review.creator);
+    if (existingReview.length !== 0) {
+      res.status(409).json({ message: 'Already reviewed' });
+      return;
+    }
+    post.reviews.push(review);
+    await post.save();
+    res.status(201).json({ message: 'Review Successfully' });
+  }
+  catch (error) {
+    res.status(404).json({ message: 'Cannot find post' });
+  }
+}
+
+const getReviews = async (req, res, next) => {
+  const postId = req.params.pid;
+  if (!postId) {
+    res.status(401).send({ message: 'Cannot get post ID' });
+    return;
+  }
+  try {
+    const post = await Post.findById(postId).populate('reviews.creator', 'username avatar id');
+    res.status(200).json({
+      reviews: post.reviews.map(review => {
+        return {
+          id: review._id,
+          rating: review.rating,
+          message: review.message,
+          createdAt: review._id.getTimestamp(),
+          creator: {
+            username: review.creator.username,
+            avatar: review.creator.avatar,
+            id: review.creator._id
+          }
+        }
+      })
+    });
+  }
+  catch (error) {
+    res.status(404).json({ message: 'Cannot find post' });
+  }
+}
+
 exports.createPost = createPost;
 exports.getPosts = getPosts;
+exports.getPostById = getPostById;
 exports.approvePost = approvePost;
+exports.postReview = postReview;
+exports.getReviews = getReviews;

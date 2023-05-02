@@ -6,6 +6,10 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
+router.get('/', postController.getPosts);
+router.get('/:pid', postController.getPostById);
+router.get('/:pid/review', postController.getReviews);
+
 router.use(auth);
 
 router.post(
@@ -20,7 +24,8 @@ router.post(
   ],
   postController.createPost
 );
-router.get('/', postController.getPosts);
+
+router.post('/:pid/review', postController.postReview);
 router.patch('/:pid/approve', postController.approvePost);
 
 module.exports = router;

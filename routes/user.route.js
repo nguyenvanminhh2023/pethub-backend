@@ -21,5 +21,9 @@ router.get('/login', auth, userController.loginWithToken);
 router.get('/:uid', userController.getUser);
 router.get('/', userController.getUserList);
 router.patch('/:uid/approve', auth, userController.approveUser);
+router.patch('/favorite', auth, userController.updateFavorite);
+router.get('/:uid/favorite', userController.getFavoriteList);
+router.get('/:uid/posts', userController.getCreatedPost);
+router.get('/notifications', auth, userController.getNotifications);
 
 module.exports = router;

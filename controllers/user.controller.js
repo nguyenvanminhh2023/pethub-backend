@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user.model');
+const Post = require('../models/post.model');
 
 const register = async(req, res, next) => {
     const errors = validationResult(req);
@@ -195,6 +196,7 @@ const getUserList = async (req, res, next) => {
 const approveUser = async (req, res, next) => {
     const { userId } = req.userData;
     const { uid } = req.params;
+    console.log(req.body);
     try {
         const existingUser = await User.findOne({ _id: userId });
         if (existingUser.role !== 'admin') {
@@ -211,9 +213,159 @@ const approveUser = async (req, res, next) => {
     };
 }
 
+const updateFavorite = async (req, res, next) => {
+    const { authorization } = req.headers;
+
+    if (!authorization) {
+        res.status(401).send({ message: 'Authorization token missing' });
+    }
+
+    const { postId } = req.body;
+
+    try {
+        const accessToken = authorization.split(' ')[1];
+
+        const { userId } = jwt.verify(accessToken, process.env.SECRET);
+
+        const existingUser = await User.findOne({ _id: userId });
+
+        if (existingUser.favorite.includes(postId))
+            existingUser.favorite = existingUser.favorite.filter(item => item != postId);
+        else
+            existingUser.favorite.push(postId);
+        await existingUser.save();
+        res.status(201).json({ message: "Updated favorite list" });
+    } catch (error) {
+        return res.status(500).send({ message: 'Cannot update favorite list' });
+    }
+}
+
+const getFavoriteList = async (req, res, next) => {
+    try {
+        const userId = req.params.uid;
+
+        const existingUser = await User.findOne({ _id: userId })
+            .populate({
+                path: 'favorite',
+                populate: {
+                    path: 'creator',
+                    select: 'username avatar id'
+                }
+            })
+
+        return res.status(200).json({
+            user: {
+                id: existingUser._id,
+                posts: existingUser.favorite.map(post => {
+                    return {
+                        id: post._id,
+                        title: post.title,
+                        createdDate: post._id.getTimestamp(),
+                        description: post.description,
+                        address: post.address,
+                        price: post.price,
+                        species: post.species,
+                        image: post.images[0],
+                        star: post.star,
+                        views: post.views,
+                        age: post.age,
+                        creator: post.creator
+                    }
+                })
+            }
+        });
+    } catch (error) {
+        return res.status(404).send({ message: 'Invalid userID' });
+    }
+}
+
+const getCreatedPost = async (req, res, next) => {
+    try {
+        const userId = req.params.uid;
+
+        const posts = await Post.find({ creator: userId })
+            .populate('creator', 'id username avatar');
+
+        return res.status(200).json({
+            user: {
+                id: userId,
+                posts: posts.map(post => {
+                    return {
+                        id: post._id,
+                        title: post.title,
+                        createdDate: post._id.getTimestamp(),
+                        description: post.description,
+                        address: post.address,
+                        price: post.price,
+                        species: post.species,
+                        image: post.images[0],
+                        star: post.star,
+                        views: post.views,
+                        age: post.age,
+                        creator: post.creator
+                    }
+                })
+            }
+        });
+    } catch (error) {
+        return res.status(404).send({ message: 'Invalid userID' });
+    }
+}
+
+const getNotifications = async (req, res, next) => {
+    const { userId } = req.userData;
+    let user;
+    try {
+        user = await User.findOne({ _id: userId });
+    }
+    catch {
+        res.status(401).json({ message: 'Authorization failed' });
+        return;
+    }
+
+    const notifications = await Notification
+        .find({ type: { $in: ['APPROVED', 'UNAVAILABLE'] } })
+        .populate('post');
+
+    let response = [];
+    notifications.forEach((notification) => {
+        if (notification.post.creator.equals(user._id) || user.favorite.includes(notification.post.id)) {
+            response.push({
+                id: notification._id,
+                type: notification.type,
+                post: notification.post.id,
+                title: notification.post.title
+            })
+        }
+    });
+
+    if (user.role === 'admin') {
+        const notifications = await Notification
+            .find({ type: { $in: ['ADMIN'] } }).populate('post');;
+        notifications.forEach((notification) => {
+            response.push({
+                id: notification._id,
+                type: notification.type,
+                post: notification.post.id,
+                title: notification.post.title
+            })
+        });
+    }
+
+    response.sort(function (a, b) {
+        return b.id - a.id;
+    });
+
+    res.status(200).json({ notifications: response });
+}
+
 exports.register = register;
 exports.loginWithEmail = loginWithEmail;
 exports.loginWithToken = loginWithToken;
 exports.getUserList = getUserList;
 exports.getUser = getUser;
 exports.approveUser = approveUser;
+exports.updateFavorite = updateFavorite;
+exports.getFavoriteList = getFavoriteList;
+exports.getCreatedPost = getCreatedPost;
+exports.getNotifications = getNotifications;
