@@ -96,6 +96,7 @@ const loginWithEmail = async(req, res, next) => {
         existingUser = await User.findOne({ email: email });
     } catch (err) {
         res.status(500).send({ message: 'Log in failed, please try again later.' });
+        console.log(err);
     }
     if (!existingUser) {
         res.status(403).send({ message: 'Invalid, could not log you in.' });
@@ -123,6 +124,7 @@ const loginWithEmail = async(req, res, next) => {
         );
     } catch (err) {
         res.status(500).send({ message: 'Log in failed, please try again later.' });
+        console.log(err);
         return;
     }
 

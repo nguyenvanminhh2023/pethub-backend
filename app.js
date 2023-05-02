@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const userRoutes = require('./routes/user.route');
+const chatRoutes = require('./routes/chat.route');
+
 
 const app = express();
 require('dotenv').config();
@@ -27,7 +29,7 @@ mongoose
         console.log(err);
     });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 var http = require('http').createServer(app);
 const io = require('socket.io')(http, {
     cors: {
@@ -45,3 +47,4 @@ app.use(function (req, res, next) {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
