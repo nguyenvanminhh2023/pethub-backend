@@ -81,8 +81,11 @@ const getPosts = async (req, res, next) => {
   const species = req.query.species || ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'];
   const genre = req.query.genre || ['Đực', 'Cái'];
   const orderBy = req.query.orderBy || '_id';
-  const start = req.query.start * 1000000 || 0;
-  const end = req.query.end * 1000000 || 20000000;
+  const startAge = req.query.startAge || 0;
+  const endAge = req.query.endAge || 1000;
+  const vaccination = req.query.vaccination || [0, 1];
+  const startPrice = req.query.startPrice * 1000000 || 0;
+  const endPrice = req.query.endPrice * 1000000 || 20000000;
   const order = req.query.order === 'asc' ? '+' : '-';
   const page = req.query.page;
   const available = req.query.page ? [1] : [1, 0];
@@ -91,9 +94,12 @@ const getPosts = async (req, res, next) => {
   
   try {
     posts = await Post.find({
+      title: { $regex: keyword, $options: "i" },
       species: { $in: species },
       genre: { $in: genre },
-      price: { $gte: start, $lte: end },
+      age: { $gte: startAge, $lte: endAge },
+      vaccination: { $in: vaccination },
+      price: { $gte: startPrice, $lte: endPrice },
       available: { $in: available },
       isApproved: { $in: isApproved },
       endDate: { $gte: currentDate }
