@@ -28,7 +28,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
-    genre,
+    gender,
     price,
     weight,
     age,
@@ -44,7 +44,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
-    genre,
+    gender,
     price,
     weight,
     age,
@@ -79,7 +79,7 @@ const getPosts = async (req, res, next) => {
   const keyword = req.query.q || '';
   const address = req.query.province || '';
   const species = req.query.species || ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'];
-  const genre = req.query.genre || ['Đực', 'Cái'];
+  const gender = req.query.gender || ['Đực', 'Cái'];
   const orderBy = req.query.orderBy || '_id';
   const startAge = req.query.startAge || 0;
   const endAge = req.query.endAge || 1000;
@@ -96,7 +96,7 @@ const getPosts = async (req, res, next) => {
     posts = await Post.find({
       title: { $regex: keyword, $options: "i" },
       species: { $in: species },
-      genre: { $in: genre },
+      gender: { $in: gender },
       age: { $gte: startAge, $lte: endAge },
       vaccination: { $in: vaccination },
       price: { $gte: startPrice, $lte: endPrice },
@@ -141,6 +141,7 @@ const getPosts = async (req, res, next) => {
         address: post.address,
         price: post.price,
         species: post.species,
+        gender: post.gender,
         age: post.age,
         image: post.images[0],
         star: post.star,
