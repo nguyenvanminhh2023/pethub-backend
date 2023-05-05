@@ -62,14 +62,26 @@ const createPost = async (req, res, next) => {
     return;
   }
 
-  try {
-    const notification = new Notification({
-      type: 'ADMIN',
-      post: newPost._id
-    });
-    await notification.save();
-  }
-  catch {
+  // try {
+  //   const notification = new Notification({
+  //     type: 'ADMIN',
+  //     post: newPost._id
+  //   });
+  //   await notification.save();
+  // }
+  // catch {
+  // }
+
+  if (user.role !== 'admin') {
+    try {
+      const notification = new Notification({
+        type: 'ADMIN',
+        post: newPost._id
+      });
+      await notification.save();
+    }
+    catch {
+    }
   }
   res.status(201).json({ postId: newPost._id });
 }
@@ -175,7 +187,11 @@ const getPostById = async (req, res, next) => {
     res.status(404).send({ message: 'Could not find post for the provided id.' })
     return;
   }
-  post.views += 1;
+
+  if (post.isApproved) {
+    post.views += 1;
+  }
+  // post.views += 1;
   post.save();
 
   res.json(

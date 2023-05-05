@@ -337,7 +337,8 @@ const getNotifications = async (req, res, next) => {
                 id: notification._id,
                 type: notification.type,
                 post: notification.post.id,
-                title: notification.post.title
+                title: notification.post.title,
+                seen: notification.seen
             })
         }
     });
@@ -350,7 +351,8 @@ const getNotifications = async (req, res, next) => {
                 id: notification._id,
                 type: notification.type,
                 post: notification.post.id,
-                title: notification.post.title
+                title: notification.post.title,
+                seen: notification.seen
             })
         });
     }

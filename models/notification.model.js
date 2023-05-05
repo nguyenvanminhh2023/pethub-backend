@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const notificationSchema = new Schema({
     type: { type: String, enum: ['ADMIN', 'APPROVED', 'UNAVAILABLE'], required: true },
     post: { type: mongoose.Types.ObjectId, ref: 'Post', required: true },
+    seen: { type: Boolean, default: false, required: true}
 });
 
 notificationSchema.set('toJSON', {
