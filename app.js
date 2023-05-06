@@ -4,7 +4,11 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const userRoutes = require('./routes/user.route');
+
 const chatRoutes = require('./routes/chat.route');
+
+
+const postRoutes = require('./routes/post.route');
 
 
 const app = express();
@@ -47,4 +51,8 @@ app.use(function (req, res, next) {
 });
 
 app.use('/api/users', userRoutes);
+
 app.use('/api/chat', chatRoutes);
+
+app.use('/api/posts', postRoutes);
+
