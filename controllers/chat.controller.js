@@ -21,6 +21,7 @@ const getThreads = async (req, res, next) => {
     }
 }
 
+
 const getChatWithUser = async (req, res, next) => {
     const from = req.userData.userId;
     const to = req.params.uid;
