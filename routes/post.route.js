@@ -17,7 +17,7 @@ router.post(
   [
     check('title').not().isEmpty(),
     check('species').isIn(['Chó', 'Mèo', 'Chuột Hamster', 'Khác']),
-    check('genre').isIn(['Đực', 'Cái']),
+    check('gender').isIn(['Đực', 'Cái']),
     check('price').isNumeric({ gt: 0 }),
     check('weight').isNumeric({ gt: 0 }),
     check('age').isNumeric({ gt: 0 }),

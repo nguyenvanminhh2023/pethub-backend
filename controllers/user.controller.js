@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
+const Notification = require('../models/notification.model');
 
 const register = async(req, res, next) => {
     const errors = validationResult(req);
@@ -179,6 +180,7 @@ const getUser = async (req, res, next) => {
             user: existingUser
         });
     } catch (error) {
+        console.log(error);
         return res.status(401).send({ message: 'Cannot get user' });
     }
 }
@@ -191,6 +193,7 @@ const getUserList = async (req, res, next) => {
             users: users.map(user => user.toJSON())
         });
     } catch (error) {
+        console.log(error);
         return res.status(401).send({ message: 'Cannot get user' });
     }
 }
@@ -336,7 +339,8 @@ const getNotifications = async (req, res, next) => {
                 id: notification._id,
                 type: notification.type,
                 post: notification.post.id,
-                title: notification.post.title
+                title: notification.post.title,
+                seen: notification.seen
             })
         }
     });
@@ -349,7 +353,8 @@ const getNotifications = async (req, res, next) => {
                 id: notification._id,
                 type: notification.type,
                 post: notification.post.id,
-                title: notification.post.title
+                title: notification.post.title,
+                seen: notification.seen
             })
         });
     }

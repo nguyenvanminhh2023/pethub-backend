@@ -9,6 +9,7 @@ const chatRoutes = require('./routes/chat.route');
 
 
 const postRoutes = require('./routes/post.route');
+const notificationRoutes = require('./routes/notification.route');
 
 
 const app = express();
@@ -53,6 +54,9 @@ app.use(function (req, res, next) {
 app.use('/api/users', userRoutes);
 
 app.use('/api/chat', chatRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use('/api/posts', postRoutes);
+
+
 

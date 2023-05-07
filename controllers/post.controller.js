@@ -28,7 +28,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
-    genre,
+    gender,
     price,
     weight,
     age,
@@ -44,7 +44,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
-    genre,
+    gender,
     price,
     weight,
     age,
@@ -62,14 +62,26 @@ const createPost = async (req, res, next) => {
     return;
   }
 
-  try {
-    const notification = new Notification({
-      type: 'ADMIN',
-      post: newPost._id
-    });
-    await notification.save();
-  }
-  catch {
+  // try {
+  //   const notification = new Notification({
+  //     type: 'ADMIN',
+  //     post: newPost._id
+  //   });
+  //   await notification.save();
+  // }
+  // catch {
+  // }
+
+  if (user.role !== 'admin') {
+    try {
+      const notification = new Notification({
+        type: 'ADMIN',
+        post: newPost._id
+      });
+      await notification.save();
+    }
+    catch {
+    }
   }
   res.status(201).json({ postId: newPost._id });
 }
@@ -79,10 +91,13 @@ const getPosts = async (req, res, next) => {
   const keyword = req.query.q || '';
   const address = req.query.province || '';
   const species = req.query.species || ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'];
-  const genre = req.query.genre || ['Đực', 'Cái'];
+  const gender = req.query.gender || ['Đực', 'Cái'];
   const orderBy = req.query.orderBy || '_id';
-  const start = req.query.start * 1000000 || 0;
-  const end = req.query.end * 1000000 || 20000000;
+  const startAge = req.query.startAge || 0;
+  const endAge = req.query.endAge || 1000;
+  const vaccination = req.query.vaccination || [0, 1];
+  const startPrice = req.query.startPrice * 1000000 || 0;
+  const endPrice = req.query.endPrice * 1000000 || 20000000;
   const order = req.query.order === 'asc' ? '+' : '-';
   const page = req.query.page;
   const available = req.query.page ? [1] : [1, 0];
@@ -91,9 +106,12 @@ const getPosts = async (req, res, next) => {
   
   try {
     posts = await Post.find({
+      title: { $regex: keyword, $options: "i" },
       species: { $in: species },
-      genre: { $in: genre },
-      price: { $gte: start, $lte: end },
+      gender: { $in: gender },
+      age: { $gte: startAge, $lte: endAge },
+      vaccination: { $in: vaccination },
+      price: { $gte: startPrice, $lte: endPrice },
       available: { $in: available },
       isApproved: { $in: isApproved },
       endDate: { $gte: currentDate }
@@ -135,6 +153,8 @@ const getPosts = async (req, res, next) => {
         address: post.address,
         price: post.price,
         species: post.species,
+        gender: post.gender,
+        age: post.age,
         image: post.images[0],
         star: post.star,
         views: post.views,
@@ -167,7 +187,11 @@ const getPostById = async (req, res, next) => {
     res.status(404).send({ message: 'Could not find post for the provided id.' })
     return;
   }
-  post.views += 1;
+
+  if (post.isApproved) {
+    post.views += 1;
+  }
+  // post.views += 1;
   post.save();
 
   res.json(
