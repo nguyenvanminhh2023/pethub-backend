@@ -9,6 +9,7 @@ const postSchema = new Schema({
   commune: { type: String, required: true },
   address: { type: String, required: true },
   species: { type: String, enum: ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'], required: true},
+  quantity: { type: Number, required: true },
   gender: { type: String, enum: ['Đực', 'Cái'] },
   price: { type: Number, required: true },
   weight: { type: Number, required: true },

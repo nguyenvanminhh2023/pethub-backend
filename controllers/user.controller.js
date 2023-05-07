@@ -327,7 +327,7 @@ const getNotifications = async (req, res, next) => {
     }
 
     const notifications = await Notification
-        .find({ type: { $in: ['APPROVED', 'UNAVAILABLE'] } })
+        .find({ type: { $in: ['APPROVED', 'UNAVAILABLE', 'EXTENDAPPROVED'] } })
         .populate('post');
 
     let response = [];
@@ -345,7 +345,7 @@ const getNotifications = async (req, res, next) => {
 
     if (user.role === 'admin') {
         const notifications = await Notification
-            .find({ type: { $in: ['ADMIN'] } }).populate('post');;
+            .find({ type: { $in: ['ADMIN', 'EXTENDPOST'] } }).populate('post');;
         notifications.forEach((notification) => {
             response.push({
                 id: notification._id,

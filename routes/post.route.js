@@ -17,6 +17,7 @@ router.post(
   [
     check('title').not().isEmpty(),
     check('species').isIn(['Chó', 'Mèo', 'Chuột Hamster', 'Khác']),
+    check('quantity').isNumeric({ gt: 0 }),
     check('gender').isIn(['Đực', 'Cái']),
     check('price').isNumeric({ gt: 0 }),
     check('weight').isNumeric({ gt: 0 }),
@@ -27,5 +28,19 @@ router.post(
 
 router.post('/:pid/review', postController.postReview);
 router.patch('/:pid/approve', postController.approvePost);
+router.put(
+  '/:pid/edit',
+  [
+    check('title').not().isEmpty(),
+    check('species').isIn(['Chó', 'Mèo', 'Chuột Hamster', 'Khác']),
+    check('quantity').isNumeric({ gt: 0 }),
+    check('gender').isIn(['Đực', 'Cái']),
+    check('price').isNumeric({ gt: 0 }),
+    check('weight').isNumeric({ gt: 0 }),
+    check('age').isNumeric({ gt: 0 }),
+  ],
+  postController.editPost
+);
+router.patch('/:pid/extend', postController.extendPost);
 
 module.exports = router;
