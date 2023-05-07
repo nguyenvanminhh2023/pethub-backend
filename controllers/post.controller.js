@@ -13,6 +13,7 @@ const createPost = async (req, res, next) => {
       return;
     }
   } catch (err) {
+    console.log(err);
     res.status(500).send({ message: 'Authorization failed, please try again later.' })
     return;
   }
@@ -28,6 +29,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
+    quantity,
     gender,
     price,
     weight,
@@ -44,6 +46,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
+    quantity,
     gender,
     price,
     weight,
@@ -153,6 +156,7 @@ const getPosts = async (req, res, next) => {
         address: post.address,
         price: post.price,
         species: post.species,
+        quantity: post.quantity,
         gender: post.gender,
         age: post.age,
         image: post.images[0],
@@ -289,9 +293,116 @@ const getReviews = async (req, res, next) => {
   }
 }
 
+const editPost = async (req, res, next) => {
+  let user, post;
+  const { pid } = req.params;
+  try {
+    user = await User.findOne({ _id: req.userData.userId });
+    post = await Post.findOne({ _id: pid });
+    if (!(user.role === '' || post.creator.equals(user._id))) {
+      res.status(403).send({ message: 'You are not allowed to edit this post.' });
+      return;
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: 'Authorization failed, please try again later.' })
+    return;
+  }
+
+  try {
+    const session = await Post.startSession();
+    session.startTransaction();
+
+    const {
+      title,
+      species,
+      quantity,
+      price,
+      weight,
+      age,
+      gender,
+      vaccination,
+      description
+    } = req.body;
+
+    post.title = title;
+    post.species = species;
+    post.quantity = quantity;
+    post.price = price;
+    post.weight = weight;
+    post.age = age;
+    post.gender = gender;
+    post.vaccination = vaccination;
+    post.description = description;
+
+    await post.save();
+
+    session.endSession();
+    res.status(200).json({ message: 'Update successfully' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: 'Authorization failed, please try again later.' });
+    return;
+  }
+
+}
+
+const extendPost = async (req, res, next) => {
+  const { extendDate, pid } = req.body;
+  console.log(req.body);
+  console.log(req.userData.userId);
+
+  try {
+    const user = await User.findOne({ _id: req.userData.userId });
+    const post = await Post.findOne({ _id: pid });
+    
+    if (user.role === 'admin') {
+      post.endDate = extendDate;
+      await post.save();
+      const creator = await User.findOne({ _id: post.creator });
+      console.log(post.creator);
+      if (creator.role !== 'admin') {
+        try {
+          const notification = new Notification({
+            type: 'EXTENDAPPROVED',
+            post: post._id
+          });
+          await notification.save();
+          res.status(201).json({ message: 'Thành công (admin)' })
+        }
+        catch (err) {
+          console.log(err);
+          console.log("error line 369")
+        }
+      } else {
+        res.status(201).json({ message: 'Thành công (admin)' });
+      }
+    } else {
+      try {
+        const notification = new Notification({
+          type: 'EXTENDPOST',
+          post: post._id,
+          extendDate: extendDate
+        });
+        await notification.save();
+        res.status(201).json({ message: 'Thành công (seller)' })
+      }
+      catch (err) {
+        console.log(err);
+        console.log("error line 382")
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    console.log("error line 386")
+  }
+}
+
 exports.createPost = createPost;
 exports.getPosts = getPosts;
 exports.getPostById = getPostById;
 exports.approvePost = approvePost;
+exports.editPost = editPost;
 exports.postReview = postReview;
 exports.getReviews = getReviews;
+exports.extendPost = extendPost;
