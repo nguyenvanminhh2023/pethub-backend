@@ -92,12 +92,14 @@ const createPost = async (req, res, next) => {
 const getPosts = async (req, res, next) => {
   let posts, postsCount;
   const keyword = req.query.q || '';
-  const address = req.query.province || '';
+  const province = req.query.province || '';
   const species = req.query.species || ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'];
   const gender = req.query.gender || ['Đực', 'Cái'];
   const orderBy = req.query.orderBy || '_id';
   const startAge = req.query.startAge || 0;
   const endAge = req.query.endAge || 1000;
+  const startWeight = req.query.startWeight || 0;
+  const endWeight = req.query.endWeight || 1000;
   const vaccination = req.query.vaccination || [0, 1];
   const startPrice = req.query.startPrice * 1000000 || 0;
   const endPrice = req.query.endPrice * 1000000 || 20000000;
@@ -110,9 +112,11 @@ const getPosts = async (req, res, next) => {
   try {
     posts = await Post.find({
       title: { $regex: keyword, $options: "i" },
+      province: { $regex: province, $options: "i" },
       species: { $in: species },
       gender: { $in: gender },
       age: { $gte: startAge, $lte: endAge },
+      weight: { $gte: startWeight, $lte: endWeight },
       vaccination: { $in: vaccination },
       price: { $gte: startPrice, $lte: endPrice },
       available: { $in: available },
@@ -128,7 +132,7 @@ const getPosts = async (req, res, next) => {
       });
     }
     postsCount = posts.length;
-    const perPage = 6;
+    const perPage = 8;
     if (page) {
       posts = posts.slice((page - 1) * perPage, page * perPage);
     }
@@ -159,6 +163,7 @@ const getPosts = async (req, res, next) => {
         quantity: post.quantity,
         gender: post.gender,
         age: post.age,
+        vaccination: post.vaccination,
         image: post.images[0],
         star: post.star,
         views: post.views,
