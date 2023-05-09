@@ -20,6 +20,7 @@ const postSchema = new Schema({
   isApproved: { type: Boolean, required: true },
   available: { type: Boolean, default: true, required: true },
   endDate: { type: Date, required: true },
+  extending: { type: Boolean, default: false },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
   reviews: [{
     creator: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },

@@ -416,7 +416,7 @@ const getNotifications = async (req, res, next) => {
 
     const notifications = await Notification
         .find({ type: { $in: ['APPROVED', 'UNAVAILABLE', 'EXTENDAPPROVED'] } })
-        .populate('post');
+        .populate('post')
 
     let response = [];
     notifications.forEach((notification) => {
