@@ -37,7 +37,8 @@ const createPost = async (req, res, next) => {
     vaccination,
     description,
     images,
-    endDate
+    endDate,
+    extending
   } = req.body;
   const newPost = new Post({
     title,
@@ -55,6 +56,7 @@ const createPost = async (req, res, next) => {
     description,
     images,
     endDate,
+    extending,
     isApproved: user.role == 'admin',
     creator: req.userData.userId
   });
@@ -131,11 +133,11 @@ const getPosts = async (req, res, next) => {
         return a.star - b.star;
       });
     }
-    postsCount = posts.length;
     const perPage = 8;
     if (page) {
       posts = posts.slice((page - 1) * perPage, page * perPage);
     }
+    postsCount = posts.length;
   } catch (err) {
     res.status(404).send(
       'Error get posts!!!'
@@ -167,6 +169,8 @@ const getPosts = async (req, res, next) => {
         image: post.images[0],
         star: post.star,
         views: post.views,
+        endDate: post.endDate,
+        extending: post.extending,
         creator: {
           username: post.creator.username,
           email: post.creator.email,
@@ -199,9 +203,9 @@ const getPostById = async (req, res, next) => {
 
   if (post.isApproved) {
     post.views += 1;
+    post.save();
   }
   // post.views += 1;
-  post.save();
 
   res.json(
     {

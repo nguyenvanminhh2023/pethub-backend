@@ -330,7 +330,7 @@ const getNotifications = async (req, res, next) => {
 
     const notifications = await Notification
         .find({ type: { $in: ['APPROVED', 'UNAVAILABLE', 'EXTENDAPPROVED'] } })
-        .populate('post');
+        .populate('post')
 
     let response = [];
     notifications.forEach((notification) => {
@@ -354,7 +354,8 @@ const getNotifications = async (req, res, next) => {
                 type: notification.type,
                 post: notification.post.id,
                 title: notification.post.title,
-                seen: notification.seen
+                seen: notification.seen,
+                extendDate: notification.extendDate
             })
         });
     }
