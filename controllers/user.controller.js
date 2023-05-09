@@ -185,6 +185,92 @@ const getUser = async (req, res, next) => {
     }
 }
 
+const editUser = async (req, res, next) => {
+    let user, requestingUser;
+    const { uid } = req.params;
+    try {
+        user = await User.findOne({ _id: uid });
+        requestingUser = await User.findOne({ _id: req.userData.userId });
+        if (!(requestingUser.role === 'admin' || req.userData.userId == user._id)) {
+            res.status(403).send({ message: 'You are not able to edit user profile.' });
+            return;
+        }
+    }
+    catch (err) {
+        res.status(500).send({ message: 'Authorization failed, please try again later.' })
+        return;
+    }
+
+    try {
+        const session = await User.startSession();
+        session.startTransaction();
+
+        const { username, citizen, address, phone } = req.body;
+        user.username = username; user.citizen = citizen;
+        user.address = address;
+        user.phone = phone;
+        await user.save();
+
+        session.endSession();
+        res.status(200).json({ message: 'Update successfully' });
+    }
+    catch (err) {
+        res.status(500).send({ message: 'Authorization failed, please try again later.' })
+        return;
+    }
+}
+
+const editUserPassword = async (req, res, next) => {
+    let user, requestingUser;
+    const { uid } = req.params;
+    try {
+        user = await User.findOne({ _id: uid });
+        requestingUser = await User.findOne({ _id: req.userData.userId });
+        if (!(requestingUser.role === 'admin' || req.userData.userId == user._id)) {
+            res.status(403).send({ message: 'You are not able to edit user password.' });
+            return;
+        }
+    }
+    catch (err) {
+        res.status(500).send({ message: 'Authorization failed, please try again later.' })
+        return;
+    }
+
+    try {
+        const session = await User.startSession();
+        session.startTransaction();
+
+        const { oldPassword, newPassword } = req.body;
+
+        let isValidPassword = false;
+        try {
+            isValidPassword = await bcrypt.compare(oldPassword, user.password);
+        } catch (err) {
+            res.status(500).send({ message: 'Auth failed' });
+            return;
+        }
+        if (!isValidPassword) {
+            res.status(403).send({ message: 'Invalid old password.' })
+            return;
+        } else {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedPassword;
+        }
+    
+        
+        await user.save();
+
+        session.endSession();
+        res.status(200).json({ message: 'Update successfully' });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({ message: 'Authorization failed, please try again later1.' })
+        return;
+    }
+}
+
+
 const getUserList = async (req, res, next) => {
     try {
         const users = await User.find();
@@ -354,7 +440,8 @@ const getNotifications = async (req, res, next) => {
                 type: notification.type,
                 post: notification.post.id,
                 title: notification.post.title,
-                seen: notification.seen
+                seen: notification.seen,
+                extendDate: notification.extendDate
             })
         });
     }
@@ -371,6 +458,8 @@ exports.loginWithEmail = loginWithEmail;
 exports.loginWithToken = loginWithToken;
 exports.getUserList = getUserList;
 exports.getUser = getUser;
+exports.editUser = editUser;
+exports.editUserPassword = editUserPassword;
 exports.approveUser = approveUser;
 exports.updateFavorite = updateFavorite;
 exports.getFavoriteList = getFavoriteList;

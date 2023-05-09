@@ -20,6 +20,8 @@ router.post('/login', userController.loginWithEmail);
 router.get('/login', auth, userController.loginWithToken);
 router.get('/notifications', auth, userController.getNotifications);
 router.get('/:uid', userController.getUser);
+router.put('/:uid', auth, userController.editUser);
+router.patch('/:uid/password', auth, userController.editUserPassword);
 router.get('/', userController.getUserList);
 router.patch('/:uid/approve', auth, userController.approveUser);
 router.patch('/favorite', auth, userController.updateFavorite);
