@@ -94,7 +94,7 @@ const createPost = async (req, res, next) => {
 const getPosts = async (req, res, next) => {
   let posts, postsCount;
   const keyword = req.query.q || '';
-  const province = req.query.province || '';
+  const province = req.query.province || ''; 
   const species = req.query.species || ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'];
   const gender = req.query.gender || ['Đực', 'Cái'];
   const orderBy = req.query.orderBy || '_id';
@@ -253,6 +253,11 @@ const approvePost = async (req, res, next) => {
 const postReview = async (req, res, next) => {
   const postId = req.params.pid;
   const review = req.body.review;
+  var fs = require("fs");
+  var text = fs.readFileSync("../pethub-backend/badword.txt", "utf-8");
+  var badword = text.split(" ");
+  badword.pop();
+  console.log(badword);
   if (!postId) {
     res.status(401).send({ message: 'Invalid post ID' });
     return;
@@ -264,6 +269,25 @@ const postReview = async (req, res, next) => {
       res.status(409).json({ message: 'Already reviewed' });
       return;
     }
+    // for(let i = 0; i < badword.length; i++){
+    // let re = new RegExp(`${badword[i]}`,'gi')
+    // let resString = '';
+    // for(let j = 0; j < badword[i].length; j++){resString += '*';}
+    // review.message=review.message.replace(re,resString);
+    // }
+    var resString1 = '';
+    var res1 = review.message.split(' ');
+    for(let i = 0; i < badword.length; i++){
+      for(let k = 0; k < res1.length; k++){
+        let resString = '';
+        for(let j = 0; j < badword[i].length; j++){resString += '*';}
+        let temp = res1[k].toLowerCase();
+        temp == badword[i] ? res1[k] = resString : temp = "";
+      }
+    }
+        for(let j = 0; j < res1.length; j++){resString1 += res1[j];resString1+=' '}
+        review.message = resString1;
+
     post.reviews.push(review);
     await post.save();
     res.status(201).json({ message: 'Review Successfully' });
