@@ -96,7 +96,7 @@ const createPost = async (req, res, next) => {
 const getPosts = async (req, res, next) => {
   let posts, postsCount, totalPosts;
   const keyword = req.query.q || '';
-  const province = req.query.province || '';
+  const province = req.query.province || ''; 
   const species = req.query.species || ['Chó', 'Mèo', 'Chim', 'Gà', 'Chuột Hamster', 'Khác'];
   const genre = req.query.genre || '';
   const gender = req.query.gender || ['Đực', 'Cái'];
