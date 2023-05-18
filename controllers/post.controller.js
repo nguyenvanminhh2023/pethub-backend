@@ -29,6 +29,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
+    genre,
     quantity,
     gender,
     price,
@@ -47,6 +48,7 @@ const createPost = async (req, res, next) => {
     commune,
     address,
     species,
+    genre,
     quantity,
     gender,
     price,
@@ -92,10 +94,11 @@ const createPost = async (req, res, next) => {
 }
 
 const getPosts = async (req, res, next) => {
-  let posts, postsCount;
+  let posts, postsCount, totalPosts;
   const keyword = req.query.q || '';
   const province = req.query.province || '';
-  const species = req.query.species || ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'];
+  const species = req.query.species || ['Chó', 'Mèo', 'Chim', 'Gà', 'Chuột Hamster', 'Khác'];
+  const genre = req.query.genre || '';
   const gender = req.query.gender || ['Đực', 'Cái'];
   const orderBy = req.query.orderBy || '_id';
   const startAge = req.query.startAge || 0;
@@ -116,6 +119,7 @@ const getPosts = async (req, res, next) => {
       title: { $regex: keyword, $options: "i" },
       province: { $regex: province, $options: "i" },
       species: { $in: species },
+      genre: { $in: genre },
       gender: { $in: gender },
       age: { $gte: startAge, $lte: endAge },
       weight: { $gte: startWeight, $lte: endWeight },
@@ -133,6 +137,8 @@ const getPosts = async (req, res, next) => {
         return a.star - b.star;
       });
     }
+    let tempPosts = posts;
+    totalPosts = tempPosts.length;
     const perPage = 8;
     if (page) {
       posts = posts.slice((page - 1) * perPage, page * perPage);
@@ -147,6 +153,7 @@ const getPosts = async (req, res, next) => {
   }
 
   res.json({
+    totalPosts: totalPosts,
     postsCount: postsCount,
     posts: posts.map(post => {
       return {
@@ -162,6 +169,7 @@ const getPosts = async (req, res, next) => {
         address: post.address,
         price: post.price,
         species: post.species,
+        genre: post.genre,
         quantity: post.quantity,
         gender: post.gender,
         age: post.age,
@@ -269,6 +277,7 @@ const postReview = async (req, res, next) => {
     res.status(201).json({ message: 'Review Successfully' });
   }
   catch (error) {
+    console.log(error);
     res.status(404).json({ message: 'Cannot find post' });
   }
 }
@@ -325,17 +334,23 @@ const editPost = async (req, res, next) => {
     const {
       title,
       species,
+      genre,
       quantity,
       price,
       weight,
       age,
       gender,
       vaccination,
-      description
+      description,
+      province,
+      district,
+      commune,
+      address
     } = req.body;
 
     post.title = title;
     post.species = species;
+    post.genre = genre;
     post.quantity = quantity;
     post.price = price;
     post.weight = weight;
@@ -343,6 +358,10 @@ const editPost = async (req, res, next) => {
     post.gender = gender;
     post.vaccination = vaccination;
     post.description = description;
+    post.province = province;
+    post.district = district;
+    post.commune = commune;
+    post.address = address;
 
     await post.save();
 

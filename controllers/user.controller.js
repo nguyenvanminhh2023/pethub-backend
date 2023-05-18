@@ -31,7 +31,7 @@ const register = async(req, res, next) => {
         return;
     }
     if (existingUser) {
-        res.status(422).send({ message: 'User already exists.' });
+        res.status(422).send({ message: 'Tài khoản đã tồn tại.' });
         return;
     }
 
@@ -101,7 +101,7 @@ const loginWithEmail = async(req, res, next) => {
         console.log(err);
     }
     if (!existingUser) {
-        res.status(403).send({ message: 'Invalid, could not log you in.' });
+        res.status(404).send({ message: 'Tài khoản không tồn tại.' });
         return;
     }
 
@@ -113,7 +113,7 @@ const loginWithEmail = async(req, res, next) => {
         return;
     }
     if (!isValidPassword) {
-        res.status(403).send({ message: 'Invalid, could not log you in.' })
+        res.status(403).send({ message: 'Sai mật khẩu.' });
         return;
     }
 
@@ -421,7 +421,7 @@ const getNotifications = async (req, res, next) => {
     let response = [];
     notifications.forEach((notification) => {
         if (notification.post.creator.equals(user._id) || user.favorite.includes(notification.post.id)) {
-            response.push({
+            response.unshift({
                 id: notification._id,
                 type: notification.type,
                 post: notification.post.id,
@@ -435,7 +435,7 @@ const getNotifications = async (req, res, next) => {
         const notifications = await Notification
             .find({ type: { $in: ['ADMIN', 'EXTENDPOST'] } }).populate('post');;
         notifications.forEach((notification) => {
-            response.push({
+            response.unshift({
                 id: notification._id,
                 type: notification.type,
                 post: notification.post.id,
