@@ -119,7 +119,7 @@ const getPosts = async (req, res, next) => {
       title: { $regex: keyword, $options: "i" },
       province: { $regex: province, $options: "i" },
       species: { $in: species },
-      genre: { $in: genre },
+      genre: { $regex: genre, $options: "i" },
       gender: { $in: gender },
       age: { $gte: startAge, $lte: endAge },
       weight: { $gte: startWeight, $lte: endWeight },
