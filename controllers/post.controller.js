@@ -367,7 +367,8 @@ const editPost = async (req, res, next) => {
       province,
       district,
       commune,
-      address
+      address,
+      images
     } = req.body;
 
     post.title = title;
@@ -384,6 +385,7 @@ const editPost = async (req, res, next) => {
     post.district = district;
     post.commune = commune;
     post.address = address;
+    post.images = images;
 
     await post.save();
 
