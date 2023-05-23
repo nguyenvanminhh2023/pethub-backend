@@ -32,7 +32,7 @@ router.put(
   '/:pid/edit',
   [
     check('title').not().isEmpty(),
-    check('species').isIn(['Chó', 'Mèo', 'Chuột Hamster', 'Khác']),
+    check('species').isIn(['Chó', 'Mèo', 'Chim', 'Gà', 'Chuột Hamster', 'Khác']),
     check('quantity').isNumeric({ gt: 0 }),
     check('gender').isIn(['Đực', 'Cái']),
     check('price').isNumeric({ gt: 0 }),

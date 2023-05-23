@@ -410,6 +410,7 @@ const extendPost = async (req, res, next) => {
     
     if (user.role === 'admin') {
       post.endDate = extendDate;
+      post.extending = false;
       await post.save();
       const creator = await User.findOne({ _id: post.creator });
       console.log(post.creator);
@@ -437,6 +438,8 @@ const extendPost = async (req, res, next) => {
           extendDate: extendDate
         });
         await notification.save();
+        post.extending = true;
+        await post.save();
         res.status(201).json({ message: 'Thành công (seller)' })
       }
       catch (err) {

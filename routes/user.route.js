@@ -27,5 +27,6 @@ router.patch('/:uid/approve', auth, userController.approveUser);
 router.patch('/favorite', auth, userController.updateFavorite);
 router.get('/:uid/favorite', userController.getFavoriteList);
 router.get('/:uid/posts', userController.getCreatedPost);
+router.post("/chatUsers/:id", userController.getAllChatUsers);
 
 module.exports = router;

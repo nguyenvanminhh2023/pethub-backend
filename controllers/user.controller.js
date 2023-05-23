@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
 const Notification = require('../models/notification.model');
+const Messages = require('../models/message.model');
 
 const register = async(req, res, next) => {
     const errors = validationResult(req);
@@ -453,6 +454,50 @@ const getNotifications = async (req, res, next) => {
     res.status(200).json({ notifications: response });
 }
 
+const getAllChatUsers = async (req, res, next) => {
+    try {
+      haveId = false;
+      const { idChatUser } = req.body;
+      if (idChatUser) {
+        haveId = true;
+      }
+  
+      // ngoại trừ user có id trong params
+      let users = await User.find({ _id: { $ne: req.params.id } }).select([
+        "email",
+        "username",
+        "_id",
+      ]);
+      const from = req.params.id;
+      const usersWithLastMess = [];
+  
+      for (const user of users) {
+        const messages = await Messages.find({
+          users: {
+            $all: [from, user.id],
+          },
+        })
+          .sort({ updatedAt: 1 })
+          .select(["message"]);
+        const lastMess =
+          messages.length > 0 ? messages[messages.length - 1].message.text : null;
+        usersWithLastMess.push({
+          username: user.username,
+          id: user.id,
+          email: user.email,
+          lastMess,
+        });
+      }
+      const filteredUsers = usersWithLastMess.filter((user) => {
+        return (haveId && idChatUser === user.id) || user.lastMess !== null;
+      });
+      return res.json(filteredUsers);
+      // return res.json(users);
+    } catch (ex) {
+      next(ex);
+    }
+};
+
 exports.register = register;
 exports.loginWithEmail = loginWithEmail;
 exports.loginWithToken = loginWithToken;
@@ -465,3 +510,4 @@ exports.updateFavorite = updateFavorite;
 exports.getFavoriteList = getFavoriteList;
 exports.getCreatedPost = getCreatedPost;
 exports.getNotifications = getNotifications;
+exports.getAllChatUsers = getAllChatUsers;
