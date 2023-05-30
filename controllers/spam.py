@@ -15,17 +15,17 @@ def remove_encoding(text):
 
 vect = pickle.load(open('transformer.h5', 'rb'))
 model = keras.models.load_model('model_review.h5')
-def classification(comment: str):
-  comment = comment.lower()
-  comment = replace_url(comment, 'http')
-  comment = remove_encoding(comment)
-  comment = comment.split()
-  comment = ' '.join(comment)
-  X = [comment]
+def classification(review: str):
+  review = review.lower()
+  review = replace_url(review, 'http')
+  review = remove_encoding(review)
+  review = review.split()
+  review = ' '.join(review)
+  X = [review]
   X_test = vect.transform(X).toarray()
   predict = model.predict(X_test, verbose = 0)[0]
   return predict
-comment = 'vãi'
+review = 'vãi'
 result = classification(sys.argv[1])[0]
 if result > 0.5:
   print('isBad')
