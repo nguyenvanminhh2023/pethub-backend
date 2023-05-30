@@ -78,3 +78,19 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+app.get('/name', callName);
+async function callName(req, res) {
+  var spawn = require('child_process').spawn;
+
+  // E.g : http://localhost:3000/name?firstname=van&lastname=nghia
+  var process = spawn('python', [
+    './spam.py',
+    "xinh ghê"
+  ]);
+  process.stdout.on('data', function(data) {
+    console.log(data.toString());
+
+    res.send(data.toString());
+  });
+}

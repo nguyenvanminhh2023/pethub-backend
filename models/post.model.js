@@ -8,7 +8,7 @@ const postSchema = new Schema({
   district: { type: String, required: true },
   commune: { type: String, required: true },
   address: { type: String, required: true },
-  species: { type: String, enum: ['Chó', 'Mèo', 'Chuột Hamster', 'Khác'], required: true },
+  species: { type: String, enum: ['Chó', 'Mèo', 'Gà', 'Chim', 'Chuột Hamster', 'Khác'], required: true },
   genre: { type: String, required: true },
   quantity: { type: Number, required: true },
   gender: { type: String, enum: ['Đực', 'Cái'] },
@@ -26,7 +26,8 @@ const postSchema = new Schema({
   reviews: [{
     creator: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
     rating: { type: Number, required: true },
-    message: { type: String }
+    message: { type: String },
+    isBad: { type: Boolean }
   }],
   views: { type: Number, required: true, default: 0 }
 });
