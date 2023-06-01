@@ -136,6 +136,20 @@ const getPosts = async (req, res, next) => {
         }
         return a.star - b.star;
       });
+    } else if (orderBy === 'price') {
+      posts.sort((a, b) => {
+        if (order === '-') {
+          return b.price - a.price;
+        }
+        return a.price - b.price;
+      });
+    } else if (orderBy === 'views') {
+      posts.sort((a, b) => {
+        if (order === '-') {
+          return b.views - a.views;
+        }
+        return a.views - b.views;
+      });
     }
     let tempPosts = posts;
     totalPosts = tempPosts.length;
