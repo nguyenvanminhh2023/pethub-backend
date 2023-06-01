@@ -386,6 +386,7 @@ const getCreatedPost = async (req, res, next) => {
                         id: post._id,
                         title: post.title,
                         createdDate: post._id.getTimestamp(),
+                        available: post.available,
                         description: post.description,
                         address: post.address,
                         price: post.price,
