@@ -491,17 +491,19 @@ const setUnAvailablePost = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: userId });
     const post = await Post.findOne({ _id: pid });
-    if (!(user.role === 'admin' || post.creator !== user.id)) {
+    console.log(post.creator);
+    console.log(user.id);
+    if (!(user.role === 'admin' || post.creator.equals(user._id))) {
       res.status(403).json('You cannot set available this post');
       return;
     }
     post.available = false;
     await post.save();
-    const notification = new Notification({
-      type: 'UNAVAILABLE',
-      post: post._id
-    });
-    await notification.save();
+    // const notification = new Notification({
+    //   type: 'UNAVAILABLE',
+    //   post: post._id
+    // });
+    // await notification.save();
     res.json({ message: 'Success' });
   } catch {
     res.status(500).json({ message: 'Cannot activate, please try again' });
