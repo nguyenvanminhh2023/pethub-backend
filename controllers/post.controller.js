@@ -484,6 +484,29 @@ const extendPost = async (req, res, next) => {
   }
 }
 
+const setUnAvailablePost = async (req, res, next) => {
+  const { userId } = req.userData;
+  const { pid } = req.params;
+  try {
+    const user = await User.findOne({ _id: userId });
+    const post = await Post.findOne({ _id: pid });
+    if (!(user.role === 'admin' || post.creator !== user.id)) {
+      res.status(403).json('You cannot set available this post');
+      return;
+    }
+    post.available = false;
+    await post.save();
+    const notification = new Notification({
+      type: 'UNAVAILABLE',
+      post: post._id
+    });
+    await notification.save();
+    res.json({ message: 'Success' });
+  } catch {
+    res.status(500).json({ message: 'Cannot activate, please try again' });
+  }
+}
+
 exports.createPost = createPost;
 exports.getPosts = getPosts;
 exports.getPostById = getPostById;
@@ -492,3 +515,4 @@ exports.editPost = editPost;
 exports.postReview = postReview;
 exports.getReviews = getReviews;
 exports.extendPost = extendPost;
+exports.setUnAvailablePost = setUnAvailablePost;

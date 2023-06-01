@@ -251,7 +251,7 @@ const editUserPassword = async (req, res, next) => {
             return;
         }
         if (!isValidPassword) {
-            res.status(403).send({ message: 'Invalid old password.' })
+            res.status(403).send({ message: 'Mật khẩu cũ không đúng!' })
             return;
         } else {
             const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -394,6 +394,7 @@ const getCreatedPost = async (req, res, next) => {
                         star: post.star,
                         views: post.views,
                         age: post.age,
+                        endDate: post.endDate,
                         creator: post.creator
                     }
                 })

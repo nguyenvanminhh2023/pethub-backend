@@ -27,6 +27,7 @@ router.post(
 );
 
 router.post('/:pid/review', postController.postReview);
+router.patch('/:pid/available', postController.setUnAvailablePost);
 router.patch('/:pid/approve', postController.approvePost);
 router.put(
   '/:pid/edit',

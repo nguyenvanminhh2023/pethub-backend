@@ -86,7 +86,7 @@ async function callName(req, res) {
   // E.g : http://localhost:3000/name?firstname=van&lastname=nghia
   var process = spawn('python', [
     './spam.py',
-    "xinh ghê"
+    "chuối nhà bố bạn ngon thật"
   ]);
   process.stdout.on('data', function(data) {
     console.log(data.toString());
