@@ -116,7 +116,10 @@ const getPosts = async (req, res, next) => {
   
   try {
     posts = await Post.find({
-      title: { $regex: keyword, $options: "i" },
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
       province: { $regex: province, $options: "i" },
       species: { $in: species },
       genre: { $regex: genre, $options: "i" },
