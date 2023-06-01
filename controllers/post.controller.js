@@ -168,6 +168,7 @@ const getPosts = async (req, res, next) => {
         commune: post.commune,
         address: post.address,
         price: post.price,
+        weight: post.weight,
         species: post.species,
         genre: post.genre,
         quantity: post.quantity,
