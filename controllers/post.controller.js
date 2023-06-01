@@ -168,6 +168,7 @@ const getPosts = async (req, res, next) => {
         commune: post.commune,
         address: post.address,
         price: post.price,
+        weight: post.weight,
         species: post.species,
         genre: post.genre,
         quantity: post.quantity,
@@ -370,7 +371,7 @@ const editPost = async (req, res, next) => {
   try {
     user = await User.findOne({ _id: req.userData.userId });
     post = await Post.findOne({ _id: pid });
-    if (!(user.role === '' || post.creator.equals(user._id))) {
+    if (!(user.role === 'admin' || post.creator.equals(user._id))) {
       res.status(403).send({ message: 'You are not allowed to edit this post.' });
       return;
     }
